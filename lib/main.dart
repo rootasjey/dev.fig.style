@@ -43,7 +43,7 @@ class _AppState extends State<App> {
     return DynamicTheme(
       defaultBrightness: brightness,
       data: (brightness) => ThemeData(
-        fontFamily: GoogleFonts.raleway().fontFamily,
+        fontFamily: GoogleFonts.ptSans().fontFamily,
         brightness: brightness,
       ),
       themedWidgetBuilder: (context, theme) {
