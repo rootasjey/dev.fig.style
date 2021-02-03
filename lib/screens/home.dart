@@ -39,6 +39,7 @@ class _HomeState extends State<Home> {
   final quotesHeader = <Quote>[];
   final quotidianEndpoint = "https://api.fig.style/v1/quotidian";
   final searchQuotesEndpoint = "https://api.fig.style/v1/search/quotes?q=";
+  final _searchInputFocusNode = FocusNode();
 
   Reference referenceHeader;
 
@@ -51,6 +52,13 @@ class _HomeState extends State<Home> {
     super.initState();
     fetchQuotesHeader();
     fetchHeaderReference();
+  }
+
+  @override
+  dispose() {
+    _searchInputFocusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -1078,11 +1086,7 @@ class _HomeState extends State<Home> {
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: 40.0,
         children: [
-          SizedBox(
-            width: 400.0,
-            height: 300.0,
-            child: Card(),
-          ),
+          searchMiniPlayground(),
           SizedBox(
             width: 400.0,
             child: Column(
@@ -1119,6 +1123,113 @@ class _HomeState extends State<Home> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget searchMiniPlayground() {
+    return SizedBox(
+      width: 400.0,
+      height: 300.0,
+      child: Card(
+        elevation: 3.0,
+        child: Column(
+          children: [
+            Container(
+              height: 60.0,
+              padding: const EdgeInsets.all(16.0),
+              color: stateColors.primary,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Icon(
+                      UniconsLine.angle_right,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4.0),
+                    child: InkWell(
+                      onTap: () => _searchInputFocusNode.requestFocus(),
+                      child: Text(
+                        "v1/search/quotes?q=",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 100.0,
+                    padding: const EdgeInsets.only(right: 24.0),
+                    child: TextFormField(
+                      autofocus: false,
+                      focusNode: _searchInputFocusNode,
+                      textInputAction: TextInputAction.go,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        hintText: 'révolution',
+                        isDense: true,
+                      ),
+                      onChanged: (value) {
+                        searchQuery = value;
+                      },
+                      onFieldSubmitted: (value) => searchQuotes(),
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: searchQuotes,
+                    child: Text(
+                      "Run",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 200.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [searchCodeBlock()],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget searchCodeBlock() {
+    if (isLoadingSearch) {
+      return AnimatedAppIcon();
+    }
+
+    if (searchJson.isEmpty) {
+      return OutlinedButton(
+        onPressed: searchQuotes,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 8.0,
+          ),
+          child: Text("Run"),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 230.0,
+      width: 390.0,
+      child: SyntaxView(
+        code: searchJson,
+        syntaxTheme: stateColors.background == Colors.black
+            ? SyntaxTheme.obsidian()
+            : SyntaxTheme.gravityLight(),
+        syntax: Syntax.JAVASCRIPT,
       ),
     );
   }
@@ -1413,7 +1524,9 @@ class _HomeState extends State<Home> {
     });
 
     try {
-      final response = await http.get('$quotidianEndpoint$searchQuery');
+      final response =
+          await http.get('$searchQuotesEndpoint$searchQuery&limit=3');
+
       final Map<String, dynamic> jsonObj = jsonDecode(response.body);
 
       setState(() {
