@@ -396,6 +396,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  flutter_syntax_view:
+    dependency: "direct main"
+    description:
+      name: flutter_syntax_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -424,7 +431,7 @@ packages:
       name: google_fonts
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.2"
   graphs:
     dependency: transitive
     description:
@@ -433,7 +440,7 @@ packages:
     source: hosted
     version: "0.2.0"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -640,6 +647,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.0-nullsafety.3"
+  pretty_json:
+    dependency: "direct main"
+    description:
+      name: pretty_json
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   process:
     dependency: transitive
     description:
