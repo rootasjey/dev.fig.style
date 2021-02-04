@@ -353,7 +353,7 @@ class _AboutState extends State<About> {
             child: ListTile(
               title: Text('GitHub'),
               trailing: Icon(Icons.open_in_new),
-              onTap: () => launch(Constants.appGithubUrl),
+              onTap: () => launch(Constants.githubUrl),
             ),
           ),
         ],
