@@ -69,7 +69,11 @@ class AppRouter extends _i1.RootStackRouter {
               key: route.key, onSigninResult: route.onSigninResult));
     },
     SignupRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i13.Signup());
+      var route = entry.routeData.as<SignupRoute>();
+      return _i1.MaterialPageX(
+          entry: entry,
+          child: _i13.Signup(
+              key: route.key, onSignupResult: route.onSignupResult));
     },
     SignOutRoute.name: (entry) {
       return _i1.MaterialPageX(
@@ -299,9 +303,16 @@ class SigninRoute extends _i1.PageRouteInfo {
 }
 
 class SignupRoute extends _i1.PageRouteInfo {
-  const SignupRoute() : super(name, path: '/signup');
+  SignupRoute({this.key, this.onSignupResult}) : super(name, path: '/signup');
 
-  SignupRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
+  SignupRoute.fromMatch(_i1.RouteMatch match)
+      : key = null,
+        onSignupResult = null,
+        super.fromMatch(match);
+
+  final _i2.Key key;
+
+  final void Function(bool) onSignupResult;
 
   static const String name = 'SignupRoute';
 }

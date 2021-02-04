@@ -60,12 +60,33 @@ abstract class StateUserBase with Store {
           .doc(_userAuth.uid)
           .get();
 
-      if (user == null) {
+      final userData = user.data();
+
+      if (user == null || userData == null) {
         canManageQuotes = false;
       }
 
-      final bool canManage = user.data()['rights']['user:managequotidian'];
+      final bool canManage = userData['rights']['user:managequotidian'];
       canManageQuotes = canManage;
+
+      final devData = userData['developer'];
+      if (devData == null) {
+        return;
+      }
+
+      final isDevProgActive = devData['isProgramActive'];
+
+      if (isDevProgActive != true) {
+        final callable = CloudFunctions(
+          app: Firebase.app(),
+          region: 'europe-west3',
+        ).getHttpsCallable(
+          // functionName: 'users-updateEmail',
+          functionName: 'developers-activateDevProgram',
+        );
+
+        await callable.call();
+      }
     } on CloudFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
       canManageQuotes = false;
@@ -193,6 +214,11 @@ abstract class StateUserBase with Store {
       });
 
       setUserConnected();
+
+      appStorage.setCredentials(
+        email: email,
+        password: password,
+      );
 
       appStorage.setUserName(_userAuth.displayName);
       // PushNotifications.linkAuthUser(_userAuth.uid);
