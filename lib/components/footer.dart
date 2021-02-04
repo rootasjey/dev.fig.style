@@ -2,8 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:devfigstyle/router/app_router.gr.dart';
 import 'package:devfigstyle/state/user.dart';
 import 'package:devfigstyle/types/enums.dart';
+import 'package:devfigstyle/utils/constants.dart';
 import 'package:devfigstyle/utils/snack.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Footer extends StatefulWidget {
@@ -36,7 +38,7 @@ class _FooterState extends State<Footer> {
         runSpacing: 80.0,
         alignment: WrapAlignment.spaceAround,
         children: <Widget>[
-          languages(),
+          apps(),
           developers(),
           resourcesLinks(),
         ],
@@ -44,79 +46,46 @@ class _FooterState extends State<Footer> {
     );
   }
 
-  Widget developers() {
+  Widget apps() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(
             bottom: 30.0,
-            left: 10.0,
+            left: 4.0,
           ),
           child: Opacity(
             opacity: 0.5,
             child: Text(
-              'DEVELOPERS',
+              'APPS',
               style: TextStyle(
                 fontSize: 18.0,
               ),
             ),
           ),
         ),
-        basicButtonLink(
-          textValue: 'Documentation',
-        ),
-        basicButtonLink(
-          textValue: 'API References',
-        ),
-        basicButtonLink(
-          textValue: 'API Status',
-        ),
-        basicButtonLink(
-          textValue: 'GitHub',
-          onTap: () async {
-            onBeforeNav();
-            await launch('https://github.com/outofcontextapp/app');
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget languages() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
+        TextButton.icon(
+            onPressed: () => launch(Constants.webAppUrl),
+            icon: Icon(UniconsLine.globe),
+            label: Text('Web'),
+            style: TextButton.styleFrom(
+              primary: Colors.deepPurple,
+            )),
         Padding(
-          padding: const EdgeInsets.only(
-            bottom: 30.0,
-            left: 10.0,
-          ),
-          child: Opacity(
-            opacity: 0.5,
-            child: Text(
-              'LANGUAGE',
-              style: TextStyle(
-                fontSize: 18.0,
-              ),
-            ),
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: TextButton.icon(
+              onPressed: () => launch(Constants.playStoreUrl),
+              icon: Icon(UniconsLine.android),
+              label: Text('Android'),
+              style: TextButton.styleFrom(
+                primary: Colors.green,
+              )),
         ),
-        basicButtonLink(
-          textValue: 'English',
-          onTap: () {
-            onBeforeNav();
-            // Language.setLang(Language.en);
-            updateUserAccountLang();
-          },
-        ),
-        basicButtonLink(
-          textValue: 'Français',
-          onTap: () {
-            onBeforeNav();
-            // Language.setLang(Language.fr);
-            updateUserAccountLang();
-          },
+        TextButton.icon(
+          onPressed: () => launch(Constants.appStoreUrl),
+          icon: Icon(UniconsLine.store),
+          label: Text('iOS'),
         ),
       ],
     );
@@ -149,6 +118,49 @@ class _FooterState extends State<Footer> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget developers() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(
+            bottom: 30.0,
+            left: 10.0,
+          ),
+          child: Opacity(
+            opacity: 0.5,
+            child: Text(
+              'DEVELOPERS',
+              style: TextStyle(
+                fontSize: 18.0,
+              ),
+            ),
+          ),
+        ),
+        basicButtonLink(
+          textValue: 'Dashboard',
+          onTap: () => launch(Constants.developersPortal),
+        ),
+        basicButtonLink(
+          textValue: 'Documentation',
+        ),
+        basicButtonLink(
+          textValue: 'API References',
+        ),
+        basicButtonLink(
+          textValue: 'API Status',
+        ),
+        basicButtonLink(
+          textValue: 'GitHub',
+          onTap: () async {
+            onBeforeNav();
+            await launch(Constants.githubUrl);
+          },
+        ),
+      ],
     );
   }
 
