@@ -5,6 +5,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:devfigstyle/components/animated_app_icon.dart';
 import 'package:devfigstyle/components/desktop_app_bar.dart';
+import 'package:devfigstyle/components/footer.dart';
 import 'package:devfigstyle/router/app_router.gr.dart';
 import 'package:devfigstyle/state/colors.dart';
 import 'package:devfigstyle/types/author.dart';
@@ -111,6 +112,7 @@ class _HomeState extends State<Home> {
             features(),
             techStack(),
             plan(),
+            footer(),
           ],
         ),
       ),
@@ -579,6 +581,14 @@ class _HomeState extends State<Home> {
           searchFeature(),
         ]),
       ),
+    );
+  }
+
+  Widget footer() {
+    return SliverList(
+      delegate: SliverChildListDelegate.fixed([
+        Footer(),
+      ]),
     );
   }
 
@@ -1169,8 +1179,12 @@ class _HomeState extends State<Home> {
                       focusNode: _searchInputFocusNode,
                       textInputAction: TextInputAction.go,
                       keyboardType: TextInputType.text,
+                      style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'révolution',
+                        hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                        ),
                         isDense: true,
                       ),
                       onChanged: (value) {
