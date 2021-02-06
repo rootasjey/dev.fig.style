@@ -422,7 +422,7 @@ class _HomeState extends State<Home> {
                   ),
                   children: [
                     TextSpan(
-                      text: " / 2k requests",
+                      text: " / 5k requests",
                       style: TextStyle(
                         fontSize: 20.0,
                         color: Colors.white.withOpacity(0.4),
