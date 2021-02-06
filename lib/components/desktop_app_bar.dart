@@ -445,11 +445,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
       tooltip: "New app",
       onPressed: () {
         context.router.root.push(
-          DashboardPageRoute(
-            children: [
-              AppsDeepRoute(children: [CreateAppRoute()]),
-            ],
-          ),
+          DashboardPageRoute(children: [CreateAppRoute()]),
         );
       },
       color: stateColors.foreground,

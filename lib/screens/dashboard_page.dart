@@ -108,7 +108,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           return;
                         }
 
-                        router.navigate(item.destination);
+                        router.push(item.destination);
                       },
                     );
                   }).toList(),
