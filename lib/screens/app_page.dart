@@ -422,7 +422,10 @@ class _AppPageState extends State<AppPage> {
                   isEditingAppName = true;
                 });
               },
-              icon: Icon(UniconsLine.edit),
+              icon: Icon(
+                UniconsLine.edit,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
