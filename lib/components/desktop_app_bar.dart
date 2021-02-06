@@ -326,7 +326,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
     return [
       brightnessButton(),
       // searchButton(),
-      newQuoteButton(),
+      newAppButton(),
       userAvatar(),
     ];
   }
@@ -435,12 +435,12 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           return;
         }
 
-        context.router.root.navigate(pageRouteInfo);
+        context.router.root.push(pageRouteInfo);
       },
     );
   }
 
-  Widget newQuoteButton() {
+  Widget newAppButton() {
     return IconButton(
       tooltip: "New app",
       onPressed: () {
@@ -675,7 +675,9 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
         },
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PageRouteInfo>>[
           const PopupMenuItem(
-            value: DashboardPageRoute(),
+            value: DashboardPageRoute(
+              children: [AppsDeepRoute()],
+            ),
             child: ListTile(
               leading: Icon(Icons.dashboard),
               title: Text(
