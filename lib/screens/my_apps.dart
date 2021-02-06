@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:devfigstyle/components/empty_content.dart';
@@ -180,6 +181,17 @@ class _MyAppsState extends State<MyApps> {
           style: selectedLayout,
         );
       },
+      additionalIconButtons: [
+        IconButton(
+          tooltip: "Create a new app",
+          onPressed: () {
+            context.router.root.push(
+              DashboardPageRoute(children: [CreateAppRoute()]),
+            );
+          },
+          icon: Icon(UniconsLine.create_dashboard),
+        ),
+      ],
     );
   }
 
