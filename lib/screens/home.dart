@@ -11,6 +11,7 @@ import 'package:devfigstyle/state/colors.dart';
 import 'package:devfigstyle/types/author.dart';
 import 'package:devfigstyle/types/quote.dart';
 import 'package:devfigstyle/types/reference.dart';
+import 'package:devfigstyle/utils/api_keys.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_syntax_view/flutter_syntax_view.dart';
@@ -1538,8 +1539,12 @@ class _HomeState extends State<Home> {
     });
 
     try {
-      final response =
-          await http.get('$searchQuotesEndpoint$searchQuery&limit=3');
+      final response = await http.get(
+        '$searchQuotesEndpoint$searchQuery&limit=3',
+        headers: {
+          'authorization': ApiKeys.figStyle,
+        },
+      );
 
       final Map<String, dynamic> jsonObj = jsonDecode(response.body);
 
