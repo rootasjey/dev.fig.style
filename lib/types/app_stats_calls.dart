@@ -7,7 +7,7 @@ class AppStatsCalls {
   factory AppStatsCalls.fromJSON(Map<String, dynamic> data) {
     return AppStatsCalls(
       allTime: data['allTime'],
-      callsLimit: data['callsLimit'],
+      callsLimit: data['limit'],
     );
   }
 }
