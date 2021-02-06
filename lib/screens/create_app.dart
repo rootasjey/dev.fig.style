@@ -100,6 +100,14 @@ class _CreateAppState extends State<CreateApp> {
         sliver: SliverList(
           delegate: SliverChildListDelegate.fixed([
             AnimatedAppIcon(),
+            Center(
+              child: Text(
+                "Creating new app...",
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
           ]),
         ),
       );
@@ -111,7 +119,7 @@ class _CreateAppState extends State<CreateApp> {
         delegate: SliverChildListDelegate.fixed([
           Column(
             children: [
-              emailInput(),
+              nameInput(),
               descriptionInput(),
               validationButton(),
             ],
@@ -121,7 +129,7 @@ class _CreateAppState extends State<CreateApp> {
     );
   }
 
-  Widget emailInput() {
+  Widget nameInput() {
     return FadeInY(
       delay: 100.milliseconds,
       beginY: 50.0,
@@ -132,7 +140,7 @@ class _CreateAppState extends State<CreateApp> {
           controller: nameController,
           textInputAction: TextInputAction.next,
           decoration: InputDecoration(
-            icon: Icon(Icons.list),
+            icon: Icon(Icons.location_history_outlined),
             labelText: 'Name',
           ),
           onChanged: (value) {
@@ -170,7 +178,7 @@ class _CreateAppState extends State<CreateApp> {
           onChanged: (value) {
             description = value;
           },
-          onFieldSubmitted: (value) => createApp,
+          onFieldSubmitted: (value) => createApp(),
         ),
       ),
     );
@@ -229,7 +237,9 @@ class _CreateAppState extends State<CreateApp> {
       setState(() => isCreating = false);
 
       context.router.root.push(
-        DashboardPageRoute(children: [MyAppsRoute()]),
+        DashboardPageRoute(
+          children: [AppsDeepRoute()],
+        ),
       );
     } on CloudFunctionsException catch (exception) {
       setState(() => isCreating = false);
