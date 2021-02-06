@@ -19,11 +19,14 @@ import '../screens/signin.dart' as _i12;
 import '../screens/signup.dart' as _i13;
 import '../screens/tos.dart' as _i14;
 import '../screens/undefined_page.dart' as _i15;
-import '../screens/my_apps.dart' as _i16;
-import '../screens/delete_account.dart' as _i17;
-import '../screens/update_email.dart' as _i18;
-import '../screens/update_password.dart' as _i19;
-import '../screens/update_username.dart' as _i20;
+import '../screens/create_app.dart' as _i16;
+import '../screens/my_apps.dart' as _i17;
+import '../screens/app_page.dart' as _i18;
+import '../screens/delete_account.dart' as _i19;
+import '../screens/deactivate_dev_prog.dart' as _i20;
+import '../screens/update_email.dart' as _i21;
+import '../screens/update_password.dart' as _i22;
+import '../screens/update_username.dart' as _i23;
 
 class AppRouter extends _i1.RootStackRouter {
   AppRouter({@_i2.required this.authGuard, @_i2.required this.noAuthGuard})
@@ -58,8 +61,7 @@ class AppRouter extends _i1.RootStackRouter {
       var route = entry.routeData.as<SettingsRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i11.Settings(
-              key: route.key, showAppBar: route.showAppBar ?? false));
+          child: _i11.Settings(key: route.key, showAppBar: route.showAppBar));
     },
     SigninRoute.name: (entry) {
       var route = entry.routeData.as<SigninRoute>();
@@ -89,35 +91,50 @@ class AppRouter extends _i1.RootStackRouter {
     UndefinedPageRoute.name: (entry) {
       return _i1.MaterialPageX(entry: entry, child: _i15.UndefinedPage());
     },
-    MyAppsRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i16.MyApps());
+    AppsDeepRoute.name: (entry) {
+      return _i1.MaterialPageX(
+          entry: entry, child: const _i1.EmptyRouterPage());
+    },
+    CreateAppRoute.name: (entry) {
+      return _i1.MaterialPageX(entry: entry, child: _i16.CreateApp());
     },
     DashboardSettingsDeepRoute.name: (entry) {
       return _i1.MaterialPageX(
           entry: entry, child: const _i1.EmptyRouterPage());
     },
+    MyAppsRoute.name: (entry) {
+      return _i1.MaterialPageX(entry: entry, child: _i17.MyApps());
+    },
+    AppPageRoute.name: (entry) {
+      var route = entry.routeData.as<AppPageRoute>();
+      return _i1.MaterialPageX(
+          entry: entry,
+          child: _i18.AppPage(key: route.key, appId: route.appId));
+    },
     DashboardSettingsRoute.name: (entry) {
       var route = entry.routeData.as<DashboardSettingsRoute>();
       return _i1.MaterialPageX(
           entry: entry,
-          child: _i11.Settings(
-              key: route.key, showAppBar: route.showAppBar ?? false));
+          child: _i11.Settings(key: route.key, showAppBar: route.showAppBar));
     },
     DeleteAccountRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i17.DeleteAccount());
+      return _i1.MaterialPageX(entry: entry, child: _i19.DeleteAccount());
+    },
+    DeactivateDevProgRoute.name: (entry) {
+      return _i1.MaterialPageX(entry: entry, child: _i20.DeactivateDevProg());
     },
     AccountUpdateDeepRoute.name: (entry) {
       return _i1.MaterialPageX(
           entry: entry, child: const _i1.EmptyRouterPage());
     },
     UpdateEmailRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i18.UpdateEmail());
+      return _i1.MaterialPageX(entry: entry, child: _i21.UpdateEmail());
     },
     UpdatePasswordRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i19.UpdatePassword());
+      return _i1.MaterialPageX(entry: entry, child: _i22.UpdatePassword());
     },
     UpdateUsernameRoute.name: (entry) {
-      return _i1.MaterialPageX(entry: entry, child: _i20.UpdateUsername());
+      return _i1.MaterialPageX(entry: entry, child: _i23.UpdateUsername());
     },
     GitHubRoute.name: (entry) {
       return _i1.MaterialPageX(
@@ -147,9 +164,20 @@ class AppRouter extends _i1.RootStackRouter {
             children: [
               _i1.RouteConfig('#redirect',
                   path: '', redirectTo: 'apps', fullMatch: true),
-              _i1.RouteConfig<MyAppsRoute>(MyAppsRoute.name,
+              _i1.RouteConfig<AppsDeepRoute>(AppsDeepRoute.name,
                   path: 'apps',
-                  routeBuilder: (match) => MyAppsRoute.fromMatch(match)),
+                  routeBuilder: (match) => AppsDeepRoute.fromMatch(match),
+                  children: [
+                    _i1.RouteConfig<MyAppsRoute>(MyAppsRoute.name,
+                        path: '',
+                        routeBuilder: (match) => MyAppsRoute.fromMatch(match)),
+                    _i1.RouteConfig<AppPageRoute>(AppPageRoute.name,
+                        path: ':appId',
+                        routeBuilder: (match) => AppPageRoute.fromMatch(match))
+                  ]),
+              _i1.RouteConfig<CreateAppRoute>(CreateAppRoute.name,
+                  path: 'create/app',
+                  routeBuilder: (match) => CreateAppRoute.fromMatch(match)),
               _i1.RouteConfig<DashboardSettingsDeepRoute>(
                   DashboardSettingsDeepRoute.name,
                   path: 'settings',
@@ -165,6 +193,11 @@ class AppRouter extends _i1.RootStackRouter {
                         path: 'delete/account',
                         routeBuilder: (match) =>
                             DeleteAccountRoute.fromMatch(match)),
+                    _i1.RouteConfig<DeactivateDevProgRoute>(
+                        DeactivateDevProgRoute.name,
+                        path: 'developers/deactivate',
+                        routeBuilder: (match) =>
+                            DeactivateDevProgRoute.fromMatch(match)),
                     _i1.RouteConfig<AccountUpdateDeepRoute>(
                         AccountUpdateDeepRoute.name,
                         path: 'update',
@@ -272,8 +305,7 @@ class ForgotPasswordRoute extends _i1.PageRouteInfo {
 }
 
 class SettingsRoute extends _i1.PageRouteInfo {
-  SettingsRoute({this.key, this.showAppBar = false})
-      : super(name, path: '/settings');
+  SettingsRoute({this.key, this.showAppBar}) : super(name, path: '/settings');
 
   SettingsRoute.fromMatch(_i1.RouteMatch match)
       : key = null,
@@ -350,12 +382,21 @@ class UndefinedPageRoute extends _i1.PageRouteInfo {
   static const String name = 'UndefinedPageRoute';
 }
 
-class MyAppsRoute extends _i1.PageRouteInfo {
-  const MyAppsRoute() : super(name, path: 'apps');
+class AppsDeepRoute extends _i1.PageRouteInfo {
+  const AppsDeepRoute({List<_i1.PageRouteInfo> children})
+      : super(name, path: 'apps', initialChildren: children);
 
-  MyAppsRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
+  AppsDeepRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
-  static const String name = 'MyAppsRoute';
+  static const String name = 'AppsDeepRoute';
+}
+
+class CreateAppRoute extends _i1.PageRouteInfo {
+  const CreateAppRoute() : super(name, path: 'create/app');
+
+  CreateAppRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
+
+  static const String name = 'CreateAppRoute';
 }
 
 class DashboardSettingsDeepRoute extends _i1.PageRouteInfo {
@@ -368,9 +409,32 @@ class DashboardSettingsDeepRoute extends _i1.PageRouteInfo {
   static const String name = 'DashboardSettingsDeepRoute';
 }
 
+class MyAppsRoute extends _i1.PageRouteInfo {
+  const MyAppsRoute() : super(name, path: '');
+
+  MyAppsRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
+
+  static const String name = 'MyAppsRoute';
+}
+
+class AppPageRoute extends _i1.PageRouteInfo {
+  AppPageRoute({this.key, this.appId})
+      : super(name, path: ':appId', params: {'appId': appId});
+
+  AppPageRoute.fromMatch(_i1.RouteMatch match)
+      : key = null,
+        appId = match.pathParams.getString('appId'),
+        super.fromMatch(match);
+
+  final _i2.Key key;
+
+  final String appId;
+
+  static const String name = 'AppPageRoute';
+}
+
 class DashboardSettingsRoute extends _i1.PageRouteInfo {
-  DashboardSettingsRoute({this.key, this.showAppBar = false})
-      : super(name, path: '');
+  DashboardSettingsRoute({this.key, this.showAppBar}) : super(name, path: '');
 
   DashboardSettingsRoute.fromMatch(_i1.RouteMatch match)
       : key = null,
@@ -390,6 +454,15 @@ class DeleteAccountRoute extends _i1.PageRouteInfo {
   DeleteAccountRoute.fromMatch(_i1.RouteMatch match) : super.fromMatch(match);
 
   static const String name = 'DeleteAccountRoute';
+}
+
+class DeactivateDevProgRoute extends _i1.PageRouteInfo {
+  const DeactivateDevProgRoute() : super(name, path: 'developers/deactivate');
+
+  DeactivateDevProgRoute.fromMatch(_i1.RouteMatch match)
+      : super.fromMatch(match);
+
+  static const String name = 'DeactivateDevProgRoute';
 }
 
 class AccountUpdateDeepRoute extends _i1.PageRouteInfo {

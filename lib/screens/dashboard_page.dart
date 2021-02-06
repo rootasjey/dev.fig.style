@@ -5,6 +5,7 @@ import 'package:devfigstyle/state/colors.dart';
 import 'package:devfigstyle/state/user.dart';
 import 'package:devfigstyle/types/side_menu_item.dart';
 import 'package:flutter/material.dart';
+import 'package:unicons/unicons.dart';
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -14,8 +15,8 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final _sideMenuItems = <SideMenuItem>[
     SideMenuItem(
-      destination: MyAppsRoute(),
-      iconData: Icons.timelapse,
+      destination: AppsDeepRoute(children: [MyAppsRoute()]),
+      iconData: UniconsLine.apps,
       label: 'My Apps',
       hoverColor: Colors.yellow.shade800,
     ),
@@ -119,7 +120,11 @@ class _DashboardPageState extends State<DashboardPage> {
             left: 40.0,
             bottom: 20.0,
             child: RaisedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.router.root.push(
+                  DashboardPageRoute(children: [CreateAppRoute()]),
+                );
+              },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(30.0),
@@ -143,7 +148,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         padding: const EdgeInsets.only(left: 10.0),
                       ),
                       Text(
-                        'New quote',
+                        'Create app',
                         style: TextStyle(
                           color: Colors.white,
                         ),

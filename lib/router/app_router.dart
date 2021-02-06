@@ -5,9 +5,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:devfigstyle/router/auth_guard.dart';
 import 'package:devfigstyle/router/no_auth_guard.dart';
 import 'package:devfigstyle/screens/about.dart';
+import 'package:devfigstyle/screens/app_page.dart';
 import 'package:devfigstyle/screens/changelog.dart';
 import 'package:devfigstyle/screens/contact.dart';
+import 'package:devfigstyle/screens/create_app.dart';
 import 'package:devfigstyle/screens/dashboard_page.dart';
+import 'package:devfigstyle/screens/deactivate_dev_prog.dart';
 import 'package:devfigstyle/screens/delete_account.dart';
 import 'package:devfigstyle/screens/forgot_password.dart';
 import 'package:devfigstyle/screens/home.dart';
@@ -33,7 +36,16 @@ import 'package:devfigstyle/screens/update_username.dart';
       guards: [AuthGuard],
       children: [
         RedirectRoute(path: '', redirectTo: 'apps'),
-        AutoRoute(path: 'apps', page: MyApps),
+        AutoRoute(
+          path: 'apps',
+          page: EmptyRouterPage,
+          name: 'AppsDeepRoute',
+          children: [
+            AutoRoute(path: '', page: MyApps),
+            AutoRoute(path: ':appId', page: AppPage),
+          ],
+        ),
+        AutoRoute(path: 'create/app', page: CreateApp),
         AutoRoute(
           path: 'settings',
           page: EmptyRouterPage,
@@ -45,6 +57,7 @@ import 'package:devfigstyle/screens/update_username.dart';
               name: 'DashboardSettingsRoute',
             ),
             AutoRoute(path: 'delete/account', page: DeleteAccount),
+            AutoRoute(path: 'developers/deactivate', page: DeactivateDevProg),
             AutoRoute(
               path: 'update',
               page: EmptyRouterPage,

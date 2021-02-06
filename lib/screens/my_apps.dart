@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:devfigstyle/components/empty_content.dart';
 import 'package:devfigstyle/components/fade_in_y.dart';
 import 'package:devfigstyle/components/loading_animation.dart';
@@ -7,13 +8,16 @@ import 'package:devfigstyle/components/sliver_edge_padding.dart';
 import 'package:devfigstyle/router/app_router.gr.dart';
 import 'package:devfigstyle/state/colors.dart';
 import 'package:devfigstyle/state/user.dart';
+import 'package:devfigstyle/types/request_app_response.dart';
 import 'package:devfigstyle/types/enums.dart';
 import 'package:devfigstyle/types/user_app.dart';
 import 'package:devfigstyle/utils/app_storage.dart';
 import 'package:devfigstyle/utils/constants.dart';
 import 'package:devfigstyle/utils/snack.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:unicons/unicons.dart';
 
 class MyApps extends StatefulWidget {
   @override
@@ -58,7 +62,7 @@ class _MyAppsState extends State<MyApps> {
               onPressed: () {
                 scrollController.animateTo(
                   0.0,
-                  duration: Duration(seconds: 1),
+                  duration: 250.milliseconds,
                   curve: Curves.easeOut,
                 );
               },
@@ -107,7 +111,7 @@ class _MyAppsState extends State<MyApps> {
                       body(screenWidth: screenWidth),
                       SliverPadding(
                         padding: const EdgeInsets.only(bottom: 200.0),
-                      )
+                      ),
                     ],
                   ),
                 )
@@ -130,8 +134,8 @@ class _MyAppsState extends State<MyApps> {
     }
 
     return PageAppBar(
-      textTitle: 'Favourites',
-      textSubTitle: 'Quotes you loved the most',
+      textTitle: 'Apps',
+      textSubTitle: 'Your developer apps',
       titlePadding: EdgeInsets.only(
         left: titleLeftPadding,
       ),
@@ -209,13 +213,37 @@ class _MyAppsState extends State<MyApps> {
               icon: Opacity(
                 opacity: .8,
                 child: Icon(
-                  Icons.favorite_border,
+                  UniconsLine.apps,
                   size: 60.0,
                   color: Color(0xFFFF005C),
                 ),
               ),
-              title: "You've no favourites quotes at this moment",
-              subtitle: 'You can add them with the ❤️ button',
+              title: Opacity(
+                opacity: 0.8,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 60.0),
+                  child: Text(
+                    "You have no apps",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 25.0,
+                    ),
+                  ),
+                ),
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Opacity(
+                  opacity: 0.6,
+                  child: Text(
+                    "You can create a new one",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17.0,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -271,16 +299,50 @@ class _MyAppsState extends State<MyApps> {
           final userApp = userApps.elementAt(index);
 
           return Container(
-            width: 500.0,
+            width: 400.0,
             padding: EdgeInsets.symmetric(horizontal: horPadding),
             child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Column(children: [
-                  Text(
-                    userApp.name,
-                  )
-                ]),
+              elevation: 2.0,
+              child: InkWell(
+                onTap: () {
+                  AppPageRoute(appId: userApp.id).show(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userApp.name,
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Opacity(
+                              opacity: 0.6,
+                              child: Text(
+                                userApp.description,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w200,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        color: Colors.pink,
+                        onPressed: () => deleteApp(userApp),
+                        icon: Icon(Icons.delete_outline),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           );
@@ -296,7 +358,7 @@ class _MyAppsState extends State<MyApps> {
         Padding(
           padding: const EdgeInsets.only(top: 60.0),
           child: LoadingAnimation(
-            textTitle: 'Loading your favourites...',
+            textTitle: 'Loading your apps...',
           ),
         ),
       ]),
@@ -341,6 +403,7 @@ class _MyAppsState extends State<MyApps> {
         hasNext = limit == snapshot.docs.length;
       });
     } catch (error) {
+      setState(() => isLoading = false);
       debugPrint(error.toString());
 
       showSnack(
@@ -387,6 +450,7 @@ class _MyAppsState extends State<MyApps> {
         hasNext = limit == snapshot.docs.length;
       });
     } catch (error) {
+      setState(() => isLoading = false);
       debugPrint(error.toString());
 
       showSnack(
@@ -394,6 +458,50 @@ class _MyAppsState extends State<MyApps> {
         message: 'There was an issue while fetching your favourites.',
         type: SnackType.error,
       );
+    }
+  }
+
+  void deleteApp(UserApp app) async {
+    setState(() {
+      userApps.remove(app);
+    });
+
+    showSnack(
+      context: context,
+      type: SnackType.success,
+      message: "The app ${app.name} has been deleted.",
+    );
+
+    try {
+      final callable = CloudFunctions(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).getHttpsCallable(
+        functionName: 'developers-deleteApp',
+      );
+
+      final response = await callable.call({
+        'appId': app.id,
+      });
+
+      final deleteData = RequestAppResponse.fromJSON(response.data);
+
+      if (!deleteData.success) {
+        setState(() {
+          userApps.add(app);
+        });
+
+        showSnack(
+          context: context,
+          type: SnackType.error,
+          message: "There was an error while deleting your app ${app.name}. "
+              "Please try again later or contact the support.",
+        );
+      }
+    } on CloudFunctionsException catch (exception) {
+      debugPrint("[code: ${exception.code}] - ${exception.message}");
+    } catch (error) {
+      debugPrint(error.toString());
     }
   }
 }

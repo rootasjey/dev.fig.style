@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:devfigstyle/components/animated_app_icon.dart';
 import 'package:devfigstyle/components/app_icon.dart';
 import 'package:devfigstyle/components/base_page_app_bar.dart';
@@ -12,17 +13,18 @@ import 'package:devfigstyle/utils/app_storage.dart';
 import 'package:devfigstyle/utils/constants.dart';
 import 'package:devfigstyle/utils/snack.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supercharged/supercharged.dart';
 
-class DeleteAccount extends StatefulWidget {
+class DeactivateDevProg extends StatefulWidget {
   @override
-  DeleteAccountState createState() => DeleteAccountState();
+  DeactivateDevProgState createState() => DeactivateDevProgState();
 }
 
-class DeleteAccountState extends State<DeleteAccount> {
-  bool isDeleting = false;
+class DeactivateDevProgState extends State<DeactivateDevProg> {
+  bool isDeactivating = false;
   bool isCompleted = false;
 
   double beginY = 10.0;
@@ -56,11 +58,17 @@ class DeleteAccountState extends State<DeleteAccount> {
           Padding(
             padding: EdgeInsets.only(left: titleLeftPadding),
             child: CircleButton(
-                onTap: () => Navigator.of(context).pop(),
-                icon: Icon(Icons.arrow_back, color: stateColors.foreground)),
+              onTap: () => Navigator.of(context).pop(),
+              icon: Icon(
+                Icons.arrow_back,
+                color: stateColors.foreground,
+              ),
+            ),
           ),
           AppIcon(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+            ),
             size: 30.0,
           ),
           Expanded(
@@ -68,7 +76,7 @@ class DeleteAccountState extends State<DeleteAccount> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Delete accouunt',
+                  'Deactivate developer program',
                   style: TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.w300,
@@ -78,7 +86,7 @@ class DeleteAccountState extends State<DeleteAccount> {
                 Opacity(
                   opacity: .6,
                   child: Text(
-                    'Well, this marks the end of the adventure',
+                    "If you don't need fig.style APIs anymore",
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w400,
@@ -99,7 +107,7 @@ class DeleteAccountState extends State<DeleteAccount> {
       return completedView();
     }
 
-    if (isDeleting) {
+    if (isDeactivating) {
       return deletingView();
     }
 
@@ -126,7 +134,7 @@ class DeleteAccountState extends State<DeleteAccount> {
                 top: 30.0,
               ),
               child: Text(
-                'Your account has been successfuly deleted',
+                "Your developer program is now ended",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20.0,
@@ -152,7 +160,9 @@ class DeleteAccountState extends State<DeleteAccount> {
                 top: 45.0,
               ),
               child: OutlinedButton(
-                onPressed: () => context.router.navigate(HomeRoute()),
+                onPressed: () {
+                  context.router.root.navigate(HomeRoute());
+                },
                 child: Opacity(
                   opacity: .6,
                   child: Text(
@@ -253,7 +263,7 @@ class DeleteAccountState extends State<DeleteAccount> {
             onChanged: (value) {
               password = value;
             },
-            onFieldSubmitted: (value) => deleteAccountProcess(),
+            onFieldSubmitted: (value) => deactivateProgram(),
             validator: (value) {
               if (value.isEmpty) {
                 return 'Password login cannot be empty';
@@ -281,7 +291,7 @@ class DeleteAccountState extends State<DeleteAccount> {
 
   Widget validationButton() {
     return OutlinedButton(
-      onPressed: () => deleteAccountProcess(),
+      onPressed: () => deactivateProgram(),
       style: OutlinedButton.styleFrom(
         primary: Colors.red,
       ),
@@ -293,7 +303,7 @@ class DeleteAccountState extends State<DeleteAccount> {
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Text(
-                'DELETE ACCOUNT',
+                'DEACTIVATE',
                 style: TextStyle(
                   fontSize: 15.0,
                   fontWeight: FontWeight.bold,
@@ -377,17 +387,19 @@ class DeleteAccountState extends State<DeleteAccount> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              "Your personal data will be deleted",
+                              "All your apps will be deleted",
                               style: TextStyle(),
                             ),
                             Padding(padding: const EdgeInsets.only(top: 15.0)),
                             Text(
-                              "Your published quotes will stay on the platform",
+                              "Your third party integrations or application "
+                              "may stop working without API keys",
                               style: TextStyle(),
                             ),
                             Padding(padding: const EdgeInsets.only(top: 15.0)),
                             Text(
-                              "Your username will (slowly) be dissaciated with the published quotes",
+                              "You will keep your account and "
+                              "you will be able to connect again",
                               style: TextStyle(),
                             ),
                           ],
@@ -402,18 +414,18 @@ class DeleteAccountState extends State<DeleteAccount> {
     );
   }
 
-  void deleteAccountProcess() async {
+  void deactivateProgram() async {
     if (!inputValuesOk()) {
       return;
     }
 
-    setState(() => isDeleting = true);
+    setState(() => isDeactivating = true);
 
     try {
       final userAuth = stateUser.userAuth;
 
       if (userAuth == null) {
-        setState(() => isDeleting = false);
+        setState(() => isDeactivating = false);
         context.router.navigate(SigninRoute());
         return;
       }
@@ -426,18 +438,27 @@ class DeleteAccountState extends State<DeleteAccount> {
       await userAuth.reauthenticateWithCredential(credentials);
       final idToken = await userAuth.getIdToken();
 
-      final respDelAcc = await stateUser.deleteAccount(idToken);
+      final callable = CloudFunctions(
+        app: Firebase.app(),
+        region: 'europe-west3',
+      ).getHttpsCallable(
+        functionName: 'developers-deactivateDevProgram',
+      );
 
-      if (!respDelAcc.success) {
-        final exception = respDelAcc.error;
+      final response = await callable.call({
+        'idToken': idToken,
+      });
 
+      if (!response.data['success']) {
         setState(() {
-          isDeleting = false;
+          isDeactivating = false;
         });
 
         showSnack(
           context: context,
-          message: "[code: ${exception.code}] - ${exception.message}",
+          message:
+              "There was an error while deactivating your developer program. "
+              "Please try again or contact us.",
           type: SnackType.error,
         );
 
@@ -451,14 +472,14 @@ class DeleteAccountState extends State<DeleteAccount> {
       // PushNotifications.unlinkAuthUser();
 
       setState(() {
-        isDeleting = false;
+        isDeactivating = false;
         isCompleted = true;
       });
     } catch (error) {
       debugPrint(error.toString());
 
       setState(() {
-        isDeleting = false;
+        isDeactivating = false;
       });
 
       showSnack(

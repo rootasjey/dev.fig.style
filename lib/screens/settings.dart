@@ -26,7 +26,7 @@ class Settings extends StatefulWidget {
 
   const Settings({
     Key key,
-    @PathParam('showAppBar') this.showAppBar = false,
+    @PathParam() this.showAppBar,
   }) : super(key: key);
 
   @override
@@ -39,6 +39,7 @@ class _SettingsState extends State<Settings> {
   bool isNameAvailable = false;
   bool isThemeAuto = true;
   bool notificationsON = false;
+  bool showAppBar = false;
 
   Brightness brightness;
   Brightness currentBrightness;
@@ -66,6 +67,7 @@ class _SettingsState extends State<Settings> {
 
     isThemeAuto = appStorage.getAutoBrightness();
     currentBrightness = DynamicTheme.of(context).brightness;
+    showAppBar = widget.showAppBar ?? false;
   }
 
   @override
@@ -80,7 +82,7 @@ class _SettingsState extends State<Settings> {
             child: CustomScrollView(
               controller: _pageScrollController,
               slivers: <Widget>[
-                if (widget.showAppBar) appBar(),
+                if (showAppBar) appBar(),
                 body(),
               ],
             ),
@@ -170,7 +172,12 @@ class _SettingsState extends State<Settings> {
             delay: 100.milliseconds,
             beginX: 50.0,
             child: deleteAccountButton(),
-          )
+          ),
+          FadeInX(
+            delay: 200.milliseconds,
+            beginX: 50.0,
+            child: deactivateDevProgramButton(),
+          ),
         ],
       ),
     );
@@ -297,7 +304,7 @@ class _SettingsState extends State<Settings> {
     bool showBigTitle = false;
 
     if (MediaQuery.of(context).size.width > 700.0) {
-      paddingTop = widget.showAppBar ? 100.0 : 20.0;
+      paddingTop = showAppBar ? 100.0 : 20.0;
       showBigTitle = true;
     }
 
@@ -336,6 +343,43 @@ class _SettingsState extends State<Settings> {
     );
   }
 
+  Widget deactivateDevProgramButton() {
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.all(10.0),
+          width: 90.0,
+          height: 90.0,
+          child: Card(
+            elevation: 4.0,
+            child: InkWell(
+              onTap: () => context.router.push(
+                DeactivateDevProgRoute(),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Icon(Icons.remove_circle_outline),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 100.0,
+          child: Opacity(
+            opacity: 0.8,
+            child: Text(
+              'Deactivate dev program',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
   Widget deleteAccountButton() {
     return Column(
       children: <Widget>[
@@ -357,7 +401,7 @@ class _SettingsState extends State<Settings> {
           ),
         ),
         Opacity(
-          opacity: .8,
+          opacity: 0.8,
           child: Text(
             'Delete account',
             style: TextStyle(

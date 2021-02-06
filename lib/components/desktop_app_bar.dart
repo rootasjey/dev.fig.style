@@ -431,7 +431,7 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
       ],
       onSelected: (PageRouteInfo pageRouteInfo) {
         if (pageRouteInfo.routeName == 'GitHubRoute') {
-          launch('https://github.com/rootasjey/fig.style');
+          launch('https://github.com/rootasjey/dev.fig.style');
           return;
         }
 
@@ -443,7 +443,15 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
   Widget newQuoteButton() {
     return IconButton(
       tooltip: "New app",
-      onPressed: () {},
+      onPressed: () {
+        context.router.root.push(
+          DashboardPageRoute(
+            children: [
+              AppsDeepRoute(children: [CreateAppRoute()]),
+            ],
+          ),
+        );
+      },
       color: stateColors.foreground,
       icon: Icon(Icons.add),
     );
@@ -666,16 +674,16 @@ class _DesktopAppBarState extends State<DesktopAppBar> {
           context.router.root.push(pageRouteInfo);
         },
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PageRouteInfo>>[
-          // const PopupMenuItem(
-          //   value: SearchRoute(),
-          //   child: ListTile(
-          //     leading: Icon(Icons.search),
-          //     title: Text(
-          //       'Search',
-          //       style: TextStyle(fontWeight: FontWeight.bold),
-          //     ),
-          //   ),
-          // ),
+          const PopupMenuItem(
+            value: DashboardPageRoute(),
+            child: ListTile(
+              leading: Icon(Icons.dashboard),
+              title: Text(
+                'Dashboard',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
           PopupMenuItem(
             value: NavigationHelper.getSettingsRoute(),
             child: ListTile(

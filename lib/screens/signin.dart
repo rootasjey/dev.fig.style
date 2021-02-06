@@ -383,15 +383,13 @@ class _SigninState extends State<Signin> {
     } catch (error) {
       debugPrint(error.toString());
 
+      setState(() => isSigningIn = false);
+
       showSnack(
         context: context,
         type: SnackType.error,
         message: 'The password is incorrect or the user does not exists.',
       );
-
-      setState(() {
-        isSigningIn = false;
-      });
     }
   }
 }

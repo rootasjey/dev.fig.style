@@ -68,8 +68,25 @@ abstract class StateUserBase with Store {
 
       final bool canManage = userData['rights']['user:managequotidian'];
       canManageQuotes = canManage;
+    } on CloudFunctionsException catch (exception) {
+      debugPrint("[code: ${exception.code}] - ${exception.message}");
+      canManageQuotes = false;
+    } catch (error) {
+      debugPrint(error.toString());
+      canManageQuotes = false;
+    }
+  }
 
+  Future activateDevAccount() async {
+    try {
+      final user = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_userAuth.uid)
+          .get();
+
+      final userData = user.data();
       final devData = userData['developer'];
+
       if (devData == null) {
         return;
       }
@@ -81,7 +98,6 @@ abstract class StateUserBase with Store {
           app: Firebase.app(),
           region: 'europe-west3',
         ).getHttpsCallable(
-          // functionName: 'users-updateEmail',
           functionName: 'developers-activateDevProgram',
         );
 
@@ -89,10 +105,8 @@ abstract class StateUserBase with Store {
       }
     } on CloudFunctionsException catch (exception) {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
-      canManageQuotes = false;
     } catch (error) {
       debugPrint(error.toString());
-      canManageQuotes = false;
     }
   }
 
@@ -224,6 +238,7 @@ abstract class StateUserBase with Store {
       // PushNotifications.linkAuthUser(_userAuth.uid);
 
       await refreshUserRights();
+      await activateDevAccount();
 
       return _userAuth;
     } catch (error) {
