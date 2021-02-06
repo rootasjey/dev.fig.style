@@ -695,43 +695,6 @@ class _AppPageState extends State<AppPage> {
     );
   }
 
-  void fetch() async {
-    setState(() => isLoading = true);
-
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('apps')
-          .doc(widget.appId)
-          .get();
-
-      final data = snapshot.data();
-
-      if (!snapshot.exists || data == null) {
-        setState(() {
-          isLoading = false;
-        });
-
-        return;
-      }
-
-      data['id'] = snapshot.id;
-
-      setState(() {
-        isLoading = false;
-        userApp = UserApp.fromJSON(data);
-      });
-    } catch (error) {
-      setState(() => isLoading = false);
-      debugPrint(error.toString());
-
-      showSnack(
-        context: context,
-        message: "There was an issue while fetching the app's data.",
-        type: SnackType.error,
-      );
-    }
-  }
-
   void deleteApp(UserApp app) async {
     setState(() => isLoading = true);
 
@@ -773,6 +736,43 @@ class _AppPageState extends State<AppPage> {
       debugPrint("[code: ${exception.code}] - ${exception.message}");
     } catch (error) {
       debugPrint(error.toString());
+    }
+  }
+
+  void fetch() async {
+    setState(() => isLoading = true);
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('apps')
+          .doc(widget.appId)
+          .get();
+
+      final data = snapshot.data();
+
+      if (!snapshot.exists || data == null) {
+        setState(() {
+          isLoading = false;
+        });
+
+        return;
+      }
+
+      data['id'] = snapshot.id;
+
+      setState(() {
+        isLoading = false;
+        userApp = UserApp.fromJSON(data);
+      });
+    } catch (error) {
+      setState(() => isLoading = false);
+      debugPrint(error.toString());
+
+      showSnack(
+        context: context,
+        message: "There was an issue while fetching the app's data.",
+        type: SnackType.error,
+      );
     }
   }
 
