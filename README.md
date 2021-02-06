@@ -2,6 +2,8 @@
 
 Quotes for developers.
 
+![Home page](./screenshots/home_page.png)
+
 ## Getting Started
 
 * Go to [dev.fig.style](https://dev.fig.style)
@@ -17,4 +19,10 @@ You can now query APIs with your app's id and secret key.
 
 Contibutions are welcome for the documentation, code optimization or if by submitting new issues.
 
+## Screenshots
+
+![Dashboard app page](./screenshots/dashboard_app_page.png)
+
 ## Licence
+
+Mozilla Public License 2.0.
